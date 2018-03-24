@@ -4,6 +4,6 @@ checkout scm
 }
 
 stage ('Deploy') {
-sh 'scp -r ./index.html root@bakey.us:/usr/share/nginx/html/'
+sh 'scp -P 9022 -r ./index.html root@bakey.us:/usr/share/nginx/html/'
 }
 }
