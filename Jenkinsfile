@@ -1,5 +1,5 @@
 node {
-stage (‘Prepare environment’) {
+stage ('Prepare environment') {
 checkout scm https://github.com/Bak3y/bakey.us.git
 }
 
