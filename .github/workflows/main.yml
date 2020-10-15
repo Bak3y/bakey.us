@@ -29,7 +29,7 @@ jobs:
       run: |
         pelican
     - name: publish
-    - uses: seanmiddleditch/gha-publish-to-git@master
+      uses: seanmiddleditch/gha-publish-to-git@master
       with:
         branch: gh-pages
         github_token: '${{ secrets.GITHUB_TOKEN  }}'
