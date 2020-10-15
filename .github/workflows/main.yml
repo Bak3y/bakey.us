@@ -28,4 +28,11 @@ jobs:
     - name: Generate Site
       run: |
         pelican
+    - name: publish
+    - uses: seanmiddleditch/gha-publish-to-git@master
+      with:
+        branch: gh-pages
+        github_token: '${{ secrets.GITHUB_TOKEN  }}'
+        github_pat: '${{ secrets.GH_PAT }}'
+        source_folder: output
       
