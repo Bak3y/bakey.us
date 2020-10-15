@@ -1,2 +1,2 @@
 # bakey.us
-Repo for storing the HTML files for my website
+Repo for storing the pelican markdown files and CI tooling to create my blog
