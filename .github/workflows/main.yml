@@ -31,9 +31,9 @@ jobs:
     - name: publish
       uses: seanmiddleditch/gha-publish-to-git@master
       with:
-        branch: do-pages
+        repository: pelican_site
+        branch: master
         github_token: '${{ secrets.GITHUB_TOKEN  }}'
         github_pat: '${{ secrets.GH_PAT }}'
         source_folder: output
-        target_folder: output
       
