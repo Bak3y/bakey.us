@@ -7,8 +7,6 @@ name: CI
 on:
   push:
     branches: [ master ]
-  pull_request:
-    branches: [ master ]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -19,9 +17,14 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: iranzo/gh-pages-pelican-action@1.0.1
+      - name: Setup Python
+        uses: actions/checkout@v1
         with:
-          GH_PAGES_BRANCH: gh-pages
-          SOURCE_FOLDER: content
-          PELICAN_CONFIG_FILE: pelicanconf.py
+          python-version: 3.8.5
+      - name: Install Pelican
+        run: |
+          python3 -m pip install "pelican[markdown]"
+      - name: Generate Site
+        run: |
+          pelican
+      
