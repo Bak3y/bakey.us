@@ -32,7 +32,7 @@ jobs:
       uses: seanmiddleditch/gha-publish-to-git@master
       with:
         repository: Bak3y/pelican_site
-        branch: master
+        branch: main
         github_token: '${{ secrets.GITHUB_TOKEN  }}'
         github_pat: '${{ secrets.GH_PAT }}'
         source_folder: output
