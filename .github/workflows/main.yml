@@ -31,7 +31,7 @@ jobs:
     - name: publish
       uses: seanmiddleditch/gha-publish-to-git@master
       with:
-        repository: pelican_site
+        repository: Bak3y/pelican_site
         branch: master
         github_token: '${{ secrets.GITHUB_TOKEN  }}'
         github_pat: '${{ secrets.GH_PAT }}'
