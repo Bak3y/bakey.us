@@ -40,7 +40,8 @@ jobs:
           push: true
           tags: ${{ steps.prep.outputs.tags }}
   do-deploy:
-    runs-on: bakey-us
+    runs-on: self-hosted
+    needs: docker-build-and-push
     steps:
       - name: Pull and run image
         uses: addnab/docker-run-action@v1
