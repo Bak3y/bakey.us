@@ -47,13 +47,15 @@ jobs:
         id: vars
         run: |
          echo ::set-output name=sha_short::$(git rev-parse --short=8 ${{ github.sha }})
-      - name: Pull and run image
-        uses: addnab/docker-run-action@v1
+      - name: put secrets.GH_PAT
+        run: |
+          echo ${{ secrets.GH_PAT }} > /tmp/gh_pat.txt
+      - name: docker Login
+        run: |
+          cat /tmp/gh_pat.txt | docker login ghcr.io -u bak3y --password-stdin
+      - name: pull image
         env:
           SHORTSHA: ${{ steps.vars.outputs.sha_short }}
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GH_PAT }}
-          image: ghcr.io/bak3y/bakey.us:$SHORTSHA
+        run: |
+          docker pull ghcr.io/bak3y/bakey.us:$SHORTSHA
         
