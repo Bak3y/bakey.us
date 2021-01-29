@@ -12,10 +12,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: get shortsha
-        id: vars
-        run: |
-         echo ::set-output name=sha_short::$(git rev-parse --short=8 ${{ github.sha }})
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
@@ -26,36 +22,20 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GH_PAT }}
-      - name: Prep Tag
-        id: prep
-        env:
-          SHORTSHA: ${{ steps.vars.outputs.sha_short }}
-        run: |
-          echo ::set-output name=tags::ghcr.io/bak3y/bakey.us:$SHORTSHA
       - name: Build and Push
         uses: docker/build-push-action@v2
         with:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ steps.prep.outputs.tags }}
+          tags: ghcr.io/bak3y/bakey.us:latest
   do-deploy:
     runs-on: self-hosted
     needs: docker-build-and-push
     steps:
-      - name: get shortsha
-        id: vars
-        run: |
-         echo ::set-output name=sha_short::$(git rev-parse --short=8 ${{ github.sha }})
-      - name: put secrets.GH_PAT
-        run: |
-          echo ${{ secrets.GH_PAT }} > /tmp/gh_pat.txt
       - name: docker Login
         run: |
-          cat /tmp/gh_pat.txt | docker login ghcr.io -u bak3y --password-stdin
+          cat /tmp/gh_pat.txt | docker login ghcr.io -u bak3y -p ${{ secrets.GH_PAT }}
       - name: pull image
-        env:
-          SHORTSHA: ${{ steps.vars.outputs.sha_short }}
         run: |
-          docker pull ghcr.io/bak3y/bakey.us:$SHORTSHA
-        
+          docker pull ghcr.io/bak3y/bakey.us:latest
