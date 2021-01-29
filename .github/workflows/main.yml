@@ -41,10 +41,10 @@ jobs:
           docker pull ghcr.io/bak3y/bakey.us:latest
       - name: stop old container
         run: |
-          docker stop bakey.us
+          docker stop bakey.us || exit 0
       - name: docker system prune
         run: |
           docker system prune -af
       - name: run new container
         run: |
-          docker run --name bakey.us -p 80:80 -d ghcr.io/bak3y/bakey.us:latest
+          docker run --name bakey.us --mount type=bind,source=/etc/letsencrypt/live/www.bakey.us,target=/tmp -p 80:80 -d ghcr.io/bak3y/bakey.us:latest
