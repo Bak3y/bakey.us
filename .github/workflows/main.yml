@@ -43,6 +43,10 @@ jobs:
     runs-on: self-hosted
     needs: docker-build-and-push
     steps:
+      - name: get shortsha
+        id: vars
+        run: |
+         echo ::set-output name=sha_short::$(git rev-parse --short=8 ${{ github.sha }})
       - name: Pull and run image
         uses: addnab/docker-run-action@v1
         env:
@@ -51,5 +55,5 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GH_PAT }}
-          image: bakey.us:$SHORTSHA
+          image: ghcr.io/bak3y/bakey.us:$SHORTSHA
         
