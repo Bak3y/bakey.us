@@ -1,4 +1,4 @@
-name: ci
+name: ci-cd
 
 on:
   push:
@@ -47,4 +47,4 @@ jobs:
           docker system prune -af
       - name: run new container
         run: |
-          docker run --name bakey.us --mount type=bind,source=/etc/letsencrypt/live/www.bakey.us,target=/tmp -p 80:80 -p 443:443 -d ghcr.io/bak3y/bakey.us:latest
+          docker run --name bakey.us -v /etc/letsencrypt/:/etc/letsencrypt/ -p 80:80 -p 443:443 -d ghcr.io/bak3y/bakey.us:latest
