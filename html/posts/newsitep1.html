@@ -16,8 +16,7 @@
             target="_blank">DigitalOcean Provider</a> to generate a new droplet, import my domain name, and implement
         new DNS records and a firewall.
 
-        First up, the provider.
-    </p>
+        First up, the provider (providers.tf) along with the variable to feed in the token (variables.tf).
     <pre>
         <code>
             provider "digitalocean" {
@@ -33,9 +32,19 @@
             }
         </code>
     </pre>
-    <p>
-        You see where the token is injected allowing us to talk to DigitalOcean's API.  This allows us to create our droplet, as shown below.
+    <pre>
+        <code>
+            variable "do_token" {
+                type      = string
+              }
+        </code>
+    </pre>
     </p>
+    <p>
+        You see where the token is injected allowing us to talk to DigitalOcean's API. This allows us to create our
+        droplet, as shown below (main.tf). Note the ssh_keys argument is the ID of the one I already set up on my
+        DigitalOcean
+        account.
     <pre>
         <code>
             resource "digitalocean_droplet" "web" {
@@ -49,6 +58,105 @@
             }
         </code>
     </pre>
+    </p>
+    <p>
+        And what good is a server with no DNS record? We'll create that and some <a
+            href="https://letsencrypt.org/docs/caa/" target="_blank">CAA records for LetsEncrypt</a> (dns.tf).
+    <pre>
+            <code>
+                resource "digitalocean_domain" "bakey-us" {
+                    name       = "bakey.us"
+                  }
+                  
+                  # Add an A record to the domain for www.bakey.us
+                  resource "digitalocean_record" "www" {
+                    domain = digitalocean_domain.bakey-us.name
+                    type   = "A"
+                    name   = "www"
+                    value  = digitalocean_droplet.web.ipv4_address
+                  }
+                  
+                  resource "digitalocean_record" "caa-wild" {
+                    domain = digitalocean_domain.bakey-us.name
+                    type   = "CAA"
+                    name   = "*.bakey.us."
+                    value  = "letsencrypt.org."
+                    tag = "issuewild"
+                    flags = 0
+                  }
+                  
+                  resource "digitalocean_record" "caa" {
+                    domain = digitalocean_domain.bakey-us.name
+                    type   = "CAA"
+                    name   = "www.bakey.us."
+                    value  = "letsencrypt.org."
+                    tag = "issue"
+                    flags = 0
+                  }
+            </code>
+        </pre>
+    </p>
+    <p>
+        Last we'll make sure our firewall is set up appropriately to allow web and ssh traffic inbound, as well as all
+        traffic outbound (firewall.tf).
+    <pre>
+            <code>
+                resource "digitalocean_firewall" "www" {
+                    name = "www-bakey-us"
+                    droplet_ids = [ digitalocean_droplet.web.id ]
+                    
+                    inbound_rule {
+                      protocol         = "tcp"
+                      port_range       = "22"
+                      source_addresses = ["0.0.0.0/0", "::/0"]
+                    }
+                  
+                    inbound_rule {
+                      protocol         = "tcp"
+                      port_range       = "80"
+                      source_addresses = ["0.0.0.0/0", "::/0"]
+                    }
+                  
+                    inbound_rule {
+                      protocol         = "tcp"
+                      port_range       = "443"
+                      source_addresses = ["0.0.0.0/0", "::/0"]
+                    }
+                  
+                    inbound_rule {
+                      protocol         = "icmp"
+                      source_addresses = ["0.0.0.0/0", "::/0"]
+                    }
+                  
+                    outbound_rule {
+                      protocol              = "tcp"
+                      port_range            = "1-65535"
+                      destination_addresses = ["0.0.0.0/0", "::/0"]
+                    }
+                  
+                    outbound_rule {
+                      protocol              = "udp"
+                      port_range            = "1-65535"
+                      destination_addresses = ["0.0.0.0/0", "::/0"]
+                    }
+                  
+                    outbound_rule {
+                      protocol              = "icmp"
+                      destination_addresses = ["0.0.0.0/0", "::/0"]
+                    }
+                  }
+            </code>
+        </pre>
+    </p>
+    <p>
+        All these get checked into GitHub and connected to a Terraform workspace at <a href="https://app.terraform.io/"
+            target="_blank">app.terrafrom.io</a>. This takes me from an empty slate to a running machine I can SSH into
+        using a key I've already provided. This is important for part 2 coming next - configuring this droplet for
+        LetsEncrypt (certbot), Docker, and a GitHub runner using Ansible.
+    </p>
+    <p>
+        Posted 2021-01-31
+    </p>
     <p>
         <a href="../posts.html"><i class="material-icons">description</i>Posts</i></a> | <a href="../index.html"><i
                 class="material-icons">home</i>Home</a> | <a href="../about.html"><i
