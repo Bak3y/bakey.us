@@ -40,3 +40,8 @@ ol {
 li {
     margin: 10px 0;
 }
+
+code {
+    background-color: #262626;
+    color: #a6a6a6;
+}

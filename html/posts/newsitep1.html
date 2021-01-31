@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>bakey.us</title>
+    <link rel="preload" as="style" href="../stylesheet.css" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/icon?family=Material+Icons"
+        onload="this.onload=null;this.rel='stylesheet'">
+</head>
+
+<body>
+    <p>
+        This weekend I started working on revamping my website. I decided to use Terraform's <a
+            href="https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs"
+            target="_blank">DigitalOcean Provider</a> to generate a new droplet, import my domain name, and implement
+        new DNS records and a firewall.
+
+        First up, the provider.
+    </p>
+    <pre>
+        <code>
+            provider "digitalocean" {
+                token = var.do_token
+            }
+            
+            terraform {
+              required_providers {
+                digitalocean = {
+                  source = "digitalocean/digitalocean"
+                }
+              }
+            }
+        </code>
+    </pre>
+    <p>
+        You see where the token is injected allowing us to talk to DigitalOcean's API.  This allows us to create our droplet, as shown below.
+    </p>
+    <pre>
+        <code>
+            resource "digitalocean_droplet" "web" {
+                image  = "ubuntu-20-04-x64"
+                name   = "bakey-us"
+                region = "nyc3"
+                size   = "s-1vcpu-1gb"
+                ssh_keys = [
+                    13895248
+                ]
+            }
+        </code>
+    </pre>
+    <p>
+        <a href="../posts.html"><i class="material-icons">description</i>Posts</i></a> | <a href="../index.html"><i
+                class="material-icons">home</i>Home</a> | <a href="../about.html"><i
+                class="material-icons">face</i>About</a>
+    </p>
+</body>
+
+</html>
