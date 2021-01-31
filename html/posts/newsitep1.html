@@ -39,12 +39,10 @@
               }
         </code>
     </pre>
-    </p>
-    <p>
-        You see where the token is injected allowing us to talk to DigitalOcean's API. This allows us to create our
-        droplet, as shown below (main.tf). Note the ssh_keys argument is the ID of the one I already set up on my
-        DigitalOcean
-        account.
+    You see where the token is injected allowing us to talk to DigitalOcean's API. This allows us to create our
+    droplet, as shown below (main.tf). Note the ssh_keys argument is the ID of the one I already set up on my
+    DigitalOcean
+    account.
     <pre>
         <code>
             resource "digitalocean_droplet" "web" {
@@ -58,10 +56,8 @@
             }
         </code>
     </pre>
-    </p>
-    <p>
-        And what good is a server with no DNS record? We'll create that and some <a
-            href="https://letsencrypt.org/docs/caa/" target="_blank">CAA records for LetsEncrypt</a> (dns.tf).
+    And what good is a server with no DNS record? We'll create that and some <a href="https://letsencrypt.org/docs/caa/"
+        target="_blank">CAA records for LetsEncrypt</a> (dns.tf).
     <pre>
             <code>
                 resource "digitalocean_domain" "bakey-us" {
@@ -95,10 +91,8 @@
                   }
             </code>
         </pre>
-    </p>
-    <p>
-        Last we'll make sure our firewall is set up appropriately to allow web and ssh traffic inbound, as well as all
-        traffic outbound (firewall.tf).
+    Last we'll make sure our firewall is set up appropriately to allow web and ssh traffic inbound, as well as all
+    traffic outbound (firewall.tf).
     <pre>
             <code>
                 resource "digitalocean_firewall" "www" {
@@ -147,12 +141,10 @@
                   }
             </code>
         </pre>
-    </p>
-    <p>
-        All these get checked into GitHub and connected to a Terraform workspace at <a href="https://app.terraform.io/"
-            target="_blank">app.terrafrom.io</a>. This takes me from an empty slate to a running machine I can SSH into
-        using a key I've already provided. This is important for part 2 coming next - configuring this droplet for
-        LetsEncrypt (certbot), Docker, and a GitHub runner using Ansible.
+    All these get checked into GitHub and connected to a Terraform workspace at <a href="https://app.terraform.io/"
+        target="_blank">app.terrafrom.io</a>. This takes me from an empty slate to a running machine I can SSH into
+    using a key I've already provided. This is important for part 2 coming next - configuring this droplet for
+    LetsEncrypt (certbot), Docker, and a GitHub runner using Ansible.
     </p>
     <p>
         Posted 2021-01-31
