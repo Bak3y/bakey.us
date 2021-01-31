@@ -2,11 +2,14 @@ body {
     background-color: #a6a6a6;
 }
 
-p {
+* {
     font-family: "Lucida Console", "Courier New", monospace;
     font-display: swap;
-    padding: 25px;
     color: #262626;
+}
+
+p {
+    padding: 5px;
 }
 
 a {
@@ -23,18 +26,6 @@ a:hover {
 
 .material-icons {
     vertical-align: middle;
-}
-
-ul {
-    font-family: "Lucida Console", "Courier New", monospace;
-    font-display: swap;
-    color: #262626;
-}
-
-ol {
-    font-family: "Lucida Console", "Courier New", monospace;
-    font-display: swap;
-    color: #262626;
 }
 
 li {
