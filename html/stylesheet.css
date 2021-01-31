@@ -1,5 +1,5 @@
 body {
-    background-color: #a6a6a6;
+    background-color: #cccccc;
 }
 
 * {
@@ -34,7 +34,7 @@ li {
 
 pre code {
     background-color: #262626;
-    color: #a6a6a6;
+    color: #cccccc;
     display: block;
     padding: 5px;
     border: 1px solid #1f601f;
