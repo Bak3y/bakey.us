@@ -4,13 +4,15 @@ body {
 
 p {
     font-family: "Lucida Console", "Courier New", monospace;
+    font-display: swap;
     padding: 25px;
     color: #262626;
 }
 
 a {
-    color: #194d19;
     font-family: "Lucida Console", "Courier New", monospace;
+    font-display: swap;
+    color: #194d19;
     text-decoration: none;
 }
 
@@ -25,14 +27,16 @@ a:hover {
 
 ul {
     font-family: "Lucida Console", "Courier New", monospace;
+    font-display: swap;
     color: #262626;
 }
 
 ol {
     font-family: "Lucida Console", "Courier New", monospace;
+    font-display: swap;
     color: #262626;
 }
 
-li{
+li {
     margin: 10px 0;
-  }
+}
