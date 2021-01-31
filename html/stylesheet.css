@@ -22,3 +22,13 @@ a:hover {
 .material-icons {
     vertical-align: middle;
 }
+
+ul {
+    font-family: "Lucida Console", "Courier New", monospace;
+    color: #262626;
+}
+
+ol {
+    font-family: "Lucida Console", "Courier New", monospace;
+    color: #262626;
+}
