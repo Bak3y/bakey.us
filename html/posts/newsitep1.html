@@ -19,24 +19,24 @@
         First up, the provider (providers.tf) along with the variable to feed in the token (variables.tf).
     <pre>
         <code>
-            provider "digitalocean" {
-                token = var.do_token
+    provider "digitalocean" {
+        token = var.do_token
+    }
+
+    terraform {
+        required_providers {
+            digitalocean = {
+                source = "digitalocean/digitalocean"
             }
-            
-            terraform {
-              required_providers {
-                digitalocean = {
-                  source = "digitalocean/digitalocean"
-                }
-              }
-            }
+        }
+    }
         </code>
     </pre>
     <pre>
         <code>
-            variable "do_token" {
-                type      = string
-              }
+    variable "do_token" {
+        type      = string
+    }
         </code>
     </pre>
     You see where the token is injected allowing us to talk to DigitalOcean's API. This allows us to create our
@@ -45,100 +45,100 @@
     account.
     <pre>
         <code>
-            resource "digitalocean_droplet" "web" {
-                image  = "ubuntu-20-04-x64"
-                name   = "bakey-us"
-                region = "nyc3"
-                size   = "s-1vcpu-1gb"
-                ssh_keys = [
-                    13895248
-                ]
-            }
+    resource "digitalocean_droplet" "web" {
+        image  = "ubuntu-20-04-x64"
+        name   = "bakey-us"
+        region = "nyc3"
+        size   = "s-1vcpu-1gb"
+        ssh_keys = [
+            13895248
+        ]
+    }
         </code>
     </pre>
     And what good is a server with no DNS record? We'll create that and some <a href="https://letsencrypt.org/docs/caa/"
         target="_blank">CAA records for LetsEncrypt</a> (dns.tf).
     <pre>
             <code>
-                  resource "digitalocean_domain" "bakey-us" {
-                    name       = "bakey.us"
-                  }
-                  
-                  # Add an A record to the domain for www.bakey.us
-                  resource "digitalocean_record" "www" {
-                    domain = digitalocean_domain.bakey-us.name
-                    type   = "A"
-                    name   = "www"
-                    value  = digitalocean_droplet.web.ipv4_address
-                  }
-                  
-                  resource "digitalocean_record" "caa-wild" {
-                    domain = digitalocean_domain.bakey-us.name
-                    type   = "CAA"
-                    name   = "*.bakey.us."
-                    value  = "letsencrypt.org."
-                    tag = "issuewild"
-                    flags = 0
-                  }
-                  
-                  resource "digitalocean_record" "caa" {
-                    domain = digitalocean_domain.bakey-us.name
-                    type   = "CAA"
-                    name   = "www.bakey.us."
-                    value  = "letsencrypt.org."
-                    tag = "issue"
-                    flags = 0
-                  }
+    resource "digitalocean_domain" "bakey-us" {
+        name       = "bakey.us"
+    }
+    
+    # Add an A record to the domain for www.bakey.us
+    resource "digitalocean_record" "www" {
+        domain = digitalocean_domain.bakey-us.name
+        type   = "A"
+        name   = "www"
+        value  = digitalocean_droplet.web.ipv4_address
+    }
+    
+    resource "digitalocean_record" "caa-wild" {
+        domain = digitalocean_domain.bakey-us.name
+        type   = "CAA"
+        name   = "*.bakey.us."
+        value  = "letsencrypt.org."
+        tag = "issuewild"
+        flags = 0
+    }
+    
+    resource "digitalocean_record" "caa" {
+        domain = digitalocean_domain.bakey-us.name
+        type   = "CAA"
+        name   = "www.bakey.us."
+        value  = "letsencrypt.org."
+        tag = "issue"
+        flags = 0
+    }
             </code>
         </pre>
     Last we'll make sure our firewall is set up appropriately to allow web and ssh traffic inbound, as well as all
     traffic outbound (firewall.tf).
     <pre>
             <code>
-                resource "digitalocean_firewall" "www" {
-                    name = "www-bakey-us"
-                    droplet_ids = [ digitalocean_droplet.web.id ]
-                    
-                    inbound_rule {
-                      protocol         = "tcp"
-                      port_range       = "22"
-                      source_addresses = ["0.0.0.0/0", "::/0"]
-                    }
-                  
-                    inbound_rule {
-                      protocol         = "tcp"
-                      port_range       = "80"
-                      source_addresses = ["0.0.0.0/0", "::/0"]
-                    }
-                  
-                    inbound_rule {
-                      protocol         = "tcp"
-                      port_range       = "443"
-                      source_addresses = ["0.0.0.0/0", "::/0"]
-                    }
-                  
-                    inbound_rule {
-                      protocol         = "icmp"
-                      source_addresses = ["0.0.0.0/0", "::/0"]
-                    }
-                  
-                    outbound_rule {
-                      protocol              = "tcp"
-                      port_range            = "1-65535"
-                      destination_addresses = ["0.0.0.0/0", "::/0"]
-                    }
-                  
-                    outbound_rule {
-                      protocol              = "udp"
-                      port_range            = "1-65535"
-                      destination_addresses = ["0.0.0.0/0", "::/0"]
-                    }
-                  
-                    outbound_rule {
-                      protocol              = "icmp"
-                      destination_addresses = ["0.0.0.0/0", "::/0"]
-                    }
-                  }
+    resource "digitalocean_firewall" "www" {
+        name = "www-bakey-us"
+        droplet_ids = [ digitalocean_droplet.web.id ]
+        
+        inbound_rule {
+            protocol         = "tcp"
+            port_range       = "22"
+            source_addresses = ["0.0.0.0/0", "::/0"]
+        }
+        
+        inbound_rule {
+            protocol         = "tcp"
+            port_range       = "80"
+            source_addresses = ["0.0.0.0/0", "::/0"]
+        }
+        
+        inbound_rule {
+            protocol         = "tcp"
+            port_range       = "443"
+            source_addresses = ["0.0.0.0/0", "::/0"]
+        }
+        
+        inbound_rule {
+            protocol         = "icmp"
+            source_addresses = ["0.0.0.0/0", "::/0"]
+        }
+        
+        outbound_rule {
+            protocol              = "tcp"
+            port_range            = "1-65535"
+            destination_addresses = ["0.0.0.0/0", "::/0"]
+        }
+        
+        outbound_rule {
+            protocol              = "udp"
+            port_range            = "1-65535"
+            destination_addresses = ["0.0.0.0/0", "::/0"]
+        }
+        
+        outbound_rule {
+            protocol              = "icmp"
+            destination_addresses = ["0.0.0.0/0", "::/0"]
+        }
+    }
             </code>
         </pre>
     All these get checked into GitHub and connected to a Terraform workspace at <a href="https://app.terraform.io/"
