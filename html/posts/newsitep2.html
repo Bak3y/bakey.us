@@ -22,6 +22,44 @@
         and <a href="https://certbot.eff.org/" target="_blank">certbot</a>, which gives me free SSL certs via LetsEncrypt and keeps things auto-renewed.
     </p>
     <p>
+        So, some core concepts for Ansible that will come in handy if you check out <a href="https://github.com/Bak3y/ansible-do" target="_blank">my repo</a>.
+        <ul>
+            <li>
+                A playbook is a yaml file consisting of tasks and/or roles to be executed against the host(s) specified.
+                <a href="https://docs.ansible.com/ansible/latest/user_guide/playbooks_intro.html" target="_blank">Official docs</a>
+            </li>
+            <li>
+                A role is a set of tasks that are logically grouped together and called as a single unit.
+                <a href="https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html" target="_blank">Official docs</a>
+            </li>
+            <li>
+                A task describes the action you want to take.
+            </li>
+        </ul>
+        In my case, <a href="https://github.com/Bak3y/ansible-do/blob/main/host_configure.yml" target="_blank">host_configure.yml</a> says 
+        "Apply the roles docker, ghrunner, and certbot to webserver using the variables found in inventory/group_vars/vault.yml."
+        So let's break down what those mean a bit.
+    </p>
+    <p>
+        The roles in the repo linked above are very minimalistic, and are laid out following <a href="https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#role-directory-structure" target="_blank">
+        Ansible's guidance</a> for creating roles. Let's start with the docker role, since it's mentioned first in the playbook.
+    </p>
+    <p>
+        The <a href="https://github.com/Bak3y/ansible-do/blob/main/roles/docker/tasks/main.yml">docker role</a> describes only two tasks:
+        <ol>
+            <li>
+                "Make sure the <a href="https://packages.ubuntu.com/focal/docker.io" target="_blank">docker.io package</a> is installed using <a href="https://ubuntu.com/server/docs/package-management" target="_blank">apt.</a>"
+            </li>
+            <li>
+                "Make sure the docker service is started and that it's set to start on system boot."
+            </li>
+        </ol>
+        Easy, right?
+    </p>
+    <p>
+        Posted 2021-04-08
+    </p>
+    <p>
         <a href="../posts.html"><i class="material-icons">description</i>Posts</i></a> | <a href="../index.html"><i class="material-icons">home</i>Home</a> | <a href="../about.html"><i
                 class="material-icons">face</i>About</a>
     </p>
