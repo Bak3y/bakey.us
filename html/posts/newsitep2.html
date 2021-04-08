@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>bakey.us</title>
+    <link rel="preload" as="style" href="../stylesheet.css" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/icon?family=Material+Icons" onload="this.onload=null;this.rel='stylesheet'">
+</head>
+
+<body>
+    <p>
+        Long, long overdue post going over my Ansible config for my DO server that's running this website/blog/thing.  Does it count as a blog if you're writing raw HTML yourself?
+        At any rate, I decided to use <a href="https://github.com/ansible/ansible" target="_blank">Ansible</a> to configure my DigitalOcean droplet after Terraform built it for me.  Why?
+        Mostly due to comfort. I taught myself Ansible out of necessity in a previous role where I was able to automate quite a bit with it. It's just what I'm comfortable with. I'm sure the same sorts
+        of things could be done with Chef, Puppet, Saltstack, a shell script, python, and so on.
+    </p>
+    <p>
+        Ansible essentially connects to a system via SSH and converts the playbooks and roles in <a href="https://github.com/Bak3y/ansible-do" target="_blank">my repo</a> 
+        to python scripts to configure <a href="https://www.docker.com/" target="_blank">docker</a> (which runs the <a href="https://www.docker.com/resources/what-container" target="_blank">container</a> for this site), 
+        a <a href="https://github.com/actions/runner" target="_blank">GitHub Actions Runner</a> (which provides <a href="https://en.wikipedia.org/wiki/CI/CD" target="_blank">ci/cd</a> tooling connectivity to GitHub), 
+        and <a href="https://certbot.eff.org/" target="_blank">certbot</a>, which gives me free SSL certs via LetsEncrypt and keeps things auto-renewed.
+    </p>
+    <p>
+        <a href="../posts.html"><i class="material-icons">description</i>Posts</i></a> | <a href="../index.html"><i class="material-icons">home</i>Home</a> | <a href="../about.html"><i
+                class="material-icons">face</i>About</a>
+    </p>
+</body>
+
+</html>
