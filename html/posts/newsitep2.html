@@ -49,14 +49,87 @@
     </p>
         <ol>
             <li>
-                "Make sure the <a href="https://packages.ubuntu.com/focal/docker.io" target="_blank">docker.io package</a> is installed using <a href="https://ubuntu.com/server/docs/package-management" target="_blank">apt.</a>"
+                Make sure the <a href="https://packages.ubuntu.com/focal/docker.io" target="_blank">docker.io package</a> is installed using <a href="https://ubuntu.com/server/docs/package-management" target="_blank">apt.</a>
             </li>
             <li>
-                "Make sure the docker service is started and that it's set to start on system boot."
+                Make sure the docker service is started and that it's set to start on system boot.
             </li>
         </ol>
     <p>
         Easy, right?
+    </p>
+    <p>
+        The <a href="https://github.com/Bak3y/ansible-do/blob/main/roles/ghrunner/tasks/main.yml" target="_blank">ghrunner</a> role is next. It's a bit more complex than the docker role above, but it's not too hard to grok:
+    </p>
+    <ul>
+        <li>
+            Create the directory /tmp/actions-runner - used as a landing spot for the next task
+        </li>
+        <li>
+            Download the actions-runner-linux-x64-2.276.1.tar.gz file from the URL listed, and unarchives it to the path specified
+        </li>
+        <li>
+            Check to see if there's already a runner configured on the server, and register a variable called 'config'
+        </li>
+        <li>
+            Here's where things get interesting - this next task (<a href="https://github.com/Bak3y/ansible-do/blob/d4645983b500fb0bdfc6ca039a25b9e0b095ea18/roles/ghrunner/tasks/main.yml#L14" target="_new">configure-runner</a>)
+            does a couple of neat things.  It uses {{runnertoken}} which is passed in from the variables in the playbook (inventory/group_vars/vault.yml) <em>only when the runner config checked above doesn't exist</em>, 
+            and it doesn't log any output for security reasons.
+        </li>
+        <li>
+            Check to see if there's already a runner service in existence and register it as a variable called 'service'.
+        </li>
+        <li>
+            Install the runner service only if the service didn't exist in the previous step.
+        </li>
+        <li>
+            Make sure the runner service is started and that it's set to start on system boot.
+        </li>
+    </ul>
+    <p>
+        The variable used in the previous step contains the GitLab runner token used to connect back to my GitHub repo, and it's been encrypted using Ansible vault - so it can be safely stored
+        in GitHub and yet still available for Ansible to use. There's tons of <a href="https://docs.ansible.com/ansible/latest/user_guide/vault.html" target="_blank">good documentation</a> around on how to use Ansible vault.
+    </p>
+    <p>
+        The last role Ansible uses is <a href="https://github.com/Bak3y/ansible-do/tree/main/roles/certbot" target="_blank">certbot.</a> Sharp eyed readers will notice this role is a bit different than the others, it includes a template directory, which will get to in a sec.
+        Here's what the role's doing:
+    </p>
+    <ul>
+        <li>
+            Make sure snapd is installed and updated.
+        </li>
+        <li>
+            Remove any pre-existing certbot stuff.
+        </li>
+        <li>
+            Install the certbot <a href="https://en.wikipedia.org/wiki/Snap_(package_manager)" target="_blank">snap</a>
+        </li>
+        <li>
+            Create a symlink for certbot to work at /usr/bin/certbot
+        </li>
+        <li>
+            Allow certbot root access.
+        </li>
+        <li>
+            Install a certbot plugin for DigitalOcean dns validation.
+        </li>
+        <li>
+            Check to see if a cert already exists, register a variable 'cert'
+        </li>
+        <li>
+            Generate a config file from the template directory (mentioned above) for certbot to use.
+        </li>
+        <li>
+            Run a certbot command to generate a cert if it doesn't exist.
+        </li>
+    </ul>
+    <p>
+        So that's <em>what</em> Ansible is doing.  What about <em>where</em> it's running those tasks.  If you recall in the playbook linked above, the hosts line in the yaml file is just 'webserver',
+        which definitely is not enough info for Ansbile to use.  That's where an <a href="https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html" target="_blank">inventory</a> comes into play.
+        Mine is quite simple and contains only a <a href="https://github.com/Bak3y/ansible-do/blob/main/inventory/webserver.yml" target="_blank">single file</a> with a single host (and the user to connect as).
+    </p>
+    <p>
+        So now we have the infrastructure in code with Terraform, the configuration in code with Ansible, and next I'll show you how to glue all this stuff together to make a working site.
     </p>
     <p>
         Posted 2021-04-08
