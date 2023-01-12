@@ -35,7 +35,7 @@ jobs:
     steps:
       - name: docker Login
         run: |
-          cat /tmp/gh_pat.txt | docker login ghcr.io -u bak3y -p ${{ secrets.GH_PAT }}
+          docker login ghcr.io -u bak3y -p ${{ secrets.GH_PAT }}
       - name: pull image
         run: |
           docker pull ghcr.io/bak3y/bakey.us:latest
