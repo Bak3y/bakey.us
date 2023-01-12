@@ -5,7 +5,7 @@ body {
 * {
     font-family: Arial, Helvetica, sans-serif;
     font-display: swap;
-    color: #2b4654;
+    color: #0C151D;
 }
 
 p {
@@ -14,12 +14,12 @@ p {
 
 a {
     font-display: swap;
-    color: #578ca9;
+    color: #34576F;
     text-decoration: none;
 }
 
 a:hover {
-    color: #78a3ba;
+    color: #5589A0;
     text-decoration: underline;
 }
 
@@ -33,9 +33,9 @@ li {
 
 pre code {
     font-family: "Lucida Console", "Courier New", monospace;
-    background-color: #2b4654;
+    background-color: #0C151D;
     color: #f5f8fa;
     display: block;
     padding: 5px;
-    border: 1px solid #578ca9;
+    border: 1px solid #34576F;
 }
