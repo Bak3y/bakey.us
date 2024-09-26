@@ -31,6 +31,7 @@ jobs:
             "github_token=${{ secrets.GITHUB_TOKEN }}"
   do-deploy:
     runs-on: self-hosted
+    environment: digitalocean
     needs: docker-build-and-push
     steps:
       - name: docker Login
