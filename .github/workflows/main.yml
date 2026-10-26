@@ -4,6 +4,10 @@ on:
   push:
     branches: [main]
 
+concurrency:
+  group: production
+  cancel-in-progress: false
+
 jobs:
   docker-build-and-push:
     runs-on: ubuntu-latest
@@ -28,24 +32,72 @@ jobs:
         with:
           file: ./Dockerfile
           push: true
-          tags: ghcr.io/bak3y/bakey.us:latest
+          tags: |
+            ghcr.io/bak3y/bakey.us:latest
+            ghcr.io/bak3y/bakey.us:${{ github.sha }}
   do-deploy:
     runs-on: self-hosted
     environment: digitalocean
     needs: docker-build-and-push
+    permissions:
+      contents: read
+      packages: read
     steps:
-      - name: docker Login
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Deploy
         run: |
-          docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
-      - name: pull image
-        run: |
-          docker pull ghcr.io/bak3y/bakey.us:latest
-      - name: stop old container
-        run: |
-          docker stop bakey.us || exit 0
-      - name: docker system prune
-        run: |
-          docker system prune -af
-      - name: run new container
-        run: |
-          docker run --name bakey.us -v /etc/letsencrypt/:/etc/letsencrypt/ -p 80:80 -p 443:443 -d ghcr.io/bak3y/bakey.us:latest
+          set -euo pipefail
+          image="ghcr.io/bak3y/bakey.us:${{ github.sha }}"
+          previous_id="$(docker inspect -f '{{.Image}}' bakey.us 2>/dev/null || true)"
+
+          start_container() {
+            docker run --name bakey.us \
+              --restart unless-stopped \
+              -v /etc/letsencrypt/:/etc/letsencrypt/ \
+              -p 80:80 -p 443:443 \
+              -d "$1"
+          }
+
+          rollback() {
+            echo "Restoring the previous container" >&2
+            docker rm -f bakey.us >/dev/null 2>&1 || true
+            if [ -n "${previous_id}" ]; then
+              start_container "${previous_id}"
+            fi
+          }
+
+          docker pull "${image}"
+          docker rm -f bakey.us >/dev/null 2>&1 || true
+          if ! start_container "${image}"; then
+            rollback
+            exit 1
+          fi
+
+          ok=0
+          for _ in $(seq 1 30); do
+            code="$(curl -k -sS -o /dev/null -w '%{http_code}' --max-time 2 https://127.0.0.1/ || true)"
+            if [ "${code}" = "200" ]; then
+              ok=1
+              break
+            fi
+            sleep 1
+          done
+
+          if [ "${ok}" -ne 1 ]; then
+            echo "New container did not become ready" >&2
+            docker logs bakey.us >&2 || true
+            rollback
+            exit 1
+          fi
+
+          current_id="$(docker inspect -f '{{.Image}}' bakey.us)"
+          docker images --no-trunc --format '{{.ID}} {{.Repository}}' | while read -r id repo; do
+            if [ "${repo}" = "ghcr.io/bak3y/bakey.us" ] && [ "${id}" != "${current_id}" ]; then
+              docker rmi "${id}" || true
+            fi
+          done
